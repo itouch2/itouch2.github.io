@@ -1,3 +1,8 @@
-name: Your New Jekyll Site
+name: itouch2's thoughts
 markdown: redcarpet
 pygments: true
+permalink: /:year/:month/:day/:title/
+url: http://itouch2.github.io
+author: Tu You
+safe: true
+paginate: 16
