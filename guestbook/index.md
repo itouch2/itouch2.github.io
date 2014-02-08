@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 留言
+title: Say something
 comments: yes
 ---
 
-Say something ... maybe ...
+Maybe..blah..blah.blah.
