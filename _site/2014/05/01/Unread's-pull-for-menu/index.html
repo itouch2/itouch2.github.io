@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="Tu You" />
+    <title>Unread 的 pull-for-menu | Tu You</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="/feed/" rel="alternate" title="Tu You" type="application/atom+xml" />
+    <link rel="stylesheet" href="/media/css/style.css">
+    <link rel="stylesheet" href="/media/css/highlight.css">
+    <script type="text/javascript" src="/media/js/jquery-1.7.1.min.js"></script>
+  </head>
+  <script type="text/javascript">
+    function setTimeSpan(){
+    	var date = new Date();
+    	timeSpan.innerText=date.format('yyyy-MM-dd hh:mm:ss');
+    }
+    
+    Date.prototype.format = function(format)
+		{
+    var o =
+    	{
+    	    "M+" : this.getMonth()+1, //month
+    	    "d+" : this.getDate(),    //day
+    	    "h+" : this.getHours(),   //hour
+    	    "m+" : this.getMinutes(), //minute
+    	    "s+" : this.getSeconds(), //second
+    	    "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+    	    "S" : this.getMilliseconds() //millisecond
+    	}
+    	if(/(y+)/.test(format))
+    	format=format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));
+    	for(var k in o)
+    	if(new RegExp("("+ k +")").test(format))
+    	format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+    	return format;
+		}
+  </script>
+  <body onLoad="setInterval(setTimeSpan,1000);">
+    <div id="container">
+      <div id="main" role="main">
+        <header>
+        <h1>Unread 的 pull-for-menu</h1>
+        </header>
+        <nav>
+        <span><a title="home page" class="" href="/">Home</a></span>
+        <span><a title="about" class="" href="/about/">About</a></span>
+        <span><a title="guestbook" class="" href="/guestbook/">Guestbook</a></span>
+        <span><a title="categories" class="" href="/categories/">Categories</a></span>
+        <span><a title="tags" class="" href="/tags/">Tags</a></span>
+        <!-- <span><a title="links" class="" href="/links/">Links</a></span> -->
+        <!-- <span><a title="subscribe by RSS" class="" href="/feed/">Subscribe</a></span> -->
+        </nav>
+        <article class="content">
+        <section class="post">
+<p><em>革命进化的解析</em></p>
+
+<p>（本文译自：<a href="http://subjc.com/unread-overlay-menu/">Unread&#39;s pull-for-menu</a> ）</p>
+
+<h2>背景</h2>
+
+<p>在2013年中期，互联网的RSS世界有一个巨大的改变。Google 宣称他们的 RSS 订阅服务，<a href="http://www.google.com/reader/about/">Google Reader</a>，被关闭。对此，数百万的声音在惊慌中呼叫，然而突然间又销声匿迹了。</p>
+
+<p>缩减的用户量是其宣称关闭Google Reader的原因，尽管来自 <a href="http://www.google.com/reader/about/">Google Reader</a> 的用户的强烈反应表明这项服务仍然有广大的用户群。虽然互联网有种乐观的意识认为对于在RSS方面对于很多公司有很多机会，因为以前这个服务的市场已经被像 Google 这样的巨头占领了，但是仍然存在对 RSS 的担忧。越来越多的 <a href="http://www.google.com/reader/about/">Google Reader</a> 的替代品出来。</p>
+
+<p>尽管曾经有导致 RSS 消失的因素，RSS 至今仍活跃着，并且如今如 <a href="http://feedly.com/#discover">Feedly</a>, <a href="https://feedwrangler.net/welcome.html">Feedwrangler</a> 与 <a href="https://feedbin.com/">Feedbin</a> 正提供着 Google Reader 以前的服务。随之而来的是一大批现代的 iOS RSS 阅读器。在其中，有 <a href="http://jaredsinclair.com/unread/">Unread</a>，一个轻量干净并易于使用的提供上述服务的客户端 ，由 <a href="http://jaredsinclair.com/">Jared Sinclair</a>。在很短的时间里，它就在 app store 里有很多用户，多到很有可能你现在正通过 <a href="http://jaredsinclair.com/unread/">Unread</a> 阅读本文。</p>
+
+<p>这篇文章是有关 <a href="http://jaredsinclair.com/unread/">Unread</a> 的 pull-for-menu 的交互，同时它也有关这个交互方面的历史，这些交互是怎么演变的。</p>
+
+<h2>风景</h2>
+
+<p>如果我们去探索 iOS 上的有关新闻与内容聚合的 app 的情况，我们可以发现像 <a href="http://flipboard.com/">Flipboard</a> 与 <a href="https://www.pulse.me/">Pulse</a> 这些的应用，这些应用不仅仅提供内容消费的服务，同时提供内容的探索。你可以想像自己使用它们，并在周日的早上一边喝着咖啡（或地球的另一端喝着下午茶）一边沉浸在阅读杂志的体验中。</p>
+
+<p>在另一方面，我们有些应用如 <a href="http://reederapp.com/ios/">Reeder</a>，这种应用可以提供以一种最高效的方式来消费内容，这种应用你可以用来摆脱每天出行在路上的单调，使你避免 <a href="http://en.wikipedia.org/wiki/Fear_of_missing_out">FOMO</a>。此时你可以变想使用 <a href="http://jaredsinclair.com/unread/">Unread</a>。</p>
+
+<p><a href="http://jaredsinclair.com/unread/">Unread</a> 延续了我们<a href="http://subjc.com/castro-playback-scrubber/">之前</a>讨论的限制的主题。它使用的方式很简单：你只要登录你的 RSS 订阅的账号，然后就可以开始享受阅读了。<a href="http://jaredsinclair.com/unread/">Unread</a> 提供了一个专门为单手用户设计的交互体验方式。</p>
+
+<p>为了更好地认识 <a href="http://jaredsinclair.com/unread/">Unread</a> 的菜单交互方式的来源。让我们先从 Darwinistic 开始。</p>
+
+</section>
+<section class="meta">
+
+<br/>
+<br/>
+<span>
+	<a  href="http://itouch2.github.io/2014/04/02/Custom-Formatters/" class="pageNav"  >Previous</a>
+	&nbsp;&nbsp;&nbsp;
+	<a   class="pageNavInvalid"  >Next</a>
+</span>
+<hr>
+<span class="author">
+  <a href="http://webfrogs.github.com">Tu You</a>
+</span>
+<span class="time">
+  /
+  <time datetime="2014-05-01">2014-05-01</time>
+</span>
+<br />
+<span class="license">
+  Published under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">(CC) BY-NC-SA</a>
+</span>
+
+<span class="categories">
+  in categories
+  
+</span>
+
+
+<span class="tags">
+  tagged with 
+  
+</span>
+
+</section>
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"webfrogs"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->
+<!--
+<script type="text/javascript">
+$(function(){
+  $(document).keydown(function(e) {
+    var url = false;
+        if (e.which == 37 || e.which == 74) {  // Left arrow and J
+            
+        url = 'http://itouch2.github.io/2014/04/02/Custom-Formatters/';
+        
+        }
+        else if (e.which == 39 || e.which == 75) {  // Right arrow and K
+            
+        }
+        if (url) {
+            window.location = url;
+        }
+  });
+})
+</script>
+-->
+
+
+        </article>
+      </div>
+
+    <footer>
+        <p><small>Powered by <a href="https://github.com/mojombo/jekyll">Jekyll</a> & <a href="http://pages.github.com">GitHub</a> | Copyright 2014 - 2014 by <a href="/about/">itouch2</a></small></p>
+    </footer>
+
+    </div>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-34960818-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
+</html>
