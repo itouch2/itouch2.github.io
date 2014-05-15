@@ -28,7 +28,23 @@ date:   2014-05-01
 
 为了更好地认识 [Unread](http://jaredsinclair.com/unread/) 的菜单交互方式的来源。让我们先从 Darwinistic 开始。
 
+##进化
 
+现在我们回过头看看 [Tweetie](http://en.wikipedia.org/wiki/Tweetie)，一款认为 iOS 应用的典范。正是它引入了现在随处可见的下拉刷新。下拉刷新如此被接受，甚至被 Apple 采纳为 Mail.app 收件箱刷新的默认交互方式。
+
+随之，Facebook 的 iOS 应用使抽屉式的导航（又称为 "God Burger","Burger Basemen"）。尽管现在他们把其从主界面移除（在联系人中仍保留），但该交互在 iOS 设计领域中的使用使其成为一种传统的可接受的模式。
+
+到现在，我们有 [Unread's menu](http://jaredsinclair.com/unread/)，它是这两种被接受的传统的交互方式的结合，这是已经教给我们如何与设计进行交互的两种革命性交互 方式的进化。
+
+[Unread](http://jaredsinclair.com/unread/) 提供了一种呈现菜单的方式，当然你也可以认为这不是必需的。这是这些现有交互的产物。
+
+##解析
+
+今年的 WWDC 发布了一个闪亮的新特性来帮助开发者：UIKit Dynamics, Text Kit, Sprite Kit 以及一些 UIViewController 过渡。我们将复用这其中的两种来实现 [Unread's menu](http://jaredsinclair.com/unread/)，UIViewController 过渡以及 UIKit Dynamics，尽管 后者我们不会支持使用。
+
+我们拉开内容呈现菜单时第一件注意的是 pull 指示器的弹跳效果。这个效果在视觉上很显明。让人想起 iOS 6 中的下拉刷新动画，非常轻量又有意义的交互过程。
+
+我们之前已经简单地介绍与使用过 UIKit Dynamics，这次我们会创建一个抽象的层。 
 
 
 
