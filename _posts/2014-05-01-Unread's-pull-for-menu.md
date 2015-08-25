@@ -40,11 +40,102 @@ date:   2014-05-01
 
 ##解析
 
-今年的 WWDC 发布了一个闪亮的新特性来帮助开发者：UIKit Dynamics, Text Kit, Sprite Kit 以及一些 UIViewController 过渡。我们将复用这其中的两种来实现 [Unread's menu](http://jaredsinclair.com/unread/)，UIViewController 过渡以及 UIKit Dynamics，尽管 后者我们不会支持使用。
+今年的 WWDC 发布了一个闪亮的新特性来帮助开发者：UIKit Dynamics, Text Kit, Sprite Kit 以及一些 UIViewController 过渡。我们将复用这其中的两种来实现 [Unread's menu](http://jaredsinclair.com/unread/)，UIViewController 过渡以及 UIKit Dynamics，尽管 后者我们不会支持使用。	
 
 我们拉开内容呈现菜单时第一件注意的是 pull 指示器的弹跳效果。这个效果在视觉上很显明。让人想起 iOS 6 中的下拉刷新动画，非常轻量又有意义的交互过程。
 
 我们之前已经简单地介绍与使用过 UIKit Dynamics，这次我们会创建一个抽象的层。 
+
+##7个参数的方法
+
+Objective-C 中的一个优良的特性即是函数命名习惯。Objective-C 有其语言的多样性，提供了一种自然的方式来描述方法的作用，尽管其方法的长度会吓坏一些新的开发者。这其中有一个即是新添加的 UIView block 的动画方法 ```animateWithDuration:delay:usingSpringWithDamping:initialSpringVelocity:options:animations:completion:```，尽管这个不是 Cocoa Touch 里最长的，但是绝对 是可以上榜的。
+
+尽管其看起来很复杂，它还是一个十分简单又有效的给你的界面添加动态效果的强大方法，并且不会过多的使用 UIKit Dynamics 栈。在早些的博客中，一些观察敏锐的读者就用过这个方法，这个看起来是一个很不错的 `pull-for-menu`的弹簧效果。
+
+##拉伸
+
+你想像下你在拉伸一根橡胶带，你拉得越多，橡胶带就会越瘦。这种物理行为就在 `Unread` 的拉伸效果中体现。尽管这是个你需要仔细观察才会发现的小细节，它仍能加强我们在拖拽滚动视力超过其边界```contentSize```时遇到了阻力的感知。
+
+为了实现这个效果，我们这里创建一个view(```SCSpringExpandingView```)，它可以在两帧之前进行动画。综合的 view 会与其 superview 匹配高度，变成一个小的正方形的view
+
+```
+- (CGRect)frameForCollapsedState
+{
+    return CGRectMake(0.f, CGRectGetMidY(self.bounds) - (CGRectGetWidth(self.bounds) / 2.f), 
+                      CGRectGetWidth(self.bounds), CGRectGetWidth(self.bounds));
+}
+```
+
+当我们把 view 变成扩展的状态，它的 frame 会变成 superview 的高度，但是宽度是其一半。我们也会改变其水平方位的位置以使其居中。
+
+```
+- (CGRect)frameForExpandedState
+{
+    return CGRectMake(CGRectGetWidth(self.bounds) / 4.f, 0.f, 
+                      CGRectGetWidth(self.bounds) / 2.f, CGRectGetHeight(self.bounds));
+}
+```
+
+同时，我们设置其圆角半径为宽度的一半，使其在缩合扩展的时候有一个圆形的外观。我们还需要在其扩展缩合的过程中修改其宽度，否则，圆角会与 view 的宽度的相反。
+
+```
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    self.stretchingView.layer.cornerRadius = CGRectGetMidX(self.stretchingView.bounds);
+}
+```
+
+现在剩下的就是如何用我们的长名字的新朋友 ```animateWithDuration:delay:usingSpringWithDamping:initialSpringVelocity:options:animations:completion:``` 来动画切换两种状态。
+
+我们刚刚已经介绍了这个方法很多遍，现在让我们再细看下这两个参数，```usingSpringWithDamping```与```initialSpringVelocity```。
+
+```usingSpringWithDamping``` 的值是从0.0~1.0来决定弹簧效果的振幅，在物理上即是弹跳的力度。越接近1.0越会增强弹跳的力度并导致很小的振幅。越接近0.0则会减弱弹跳的力度并导致很大的振幅。
+
+```initialSpringVelocity``` 接受一个 CGFloat 为输入，并且其值会影响在动画期间其动画的距离。1.0的值可以在1秒中完成完整的动画距离，而0.5会在1秒中完成一半的距离。
+
+尽管这些参数是基于物理的属性，这种 case 最大的感受是
+
+```
+[UIView animateWithDuration:0.5f
+                      delay:0.0f
+     usingSpringWithDamping:0.4f
+      initialSpringVelocity:0.5f
+                    options:UIViewAnimationOptionBeginFromCurrentState
+                 animations:^{
+                     self.stretchingView.frame = [self frameForExpandedState];
+                 } completion:NULL];
+```
+
+就是这样就好了。只要一个方法调用与一几个神奇的数字，我们就可以发挥 iOS7的 UIKit 的优势。
+
+
+##一排三个
+
+现在我们创建了 ```SCSpringExpandingView```，我们需要创建一个 view 来容纳三个 SCSpringExpandingView。我们称其为 ```SCDragAffordanceView```.
+
+```SCDragAffordanceView```的基本作用是去排列三个```SCSpringExpandingView```，同时也提供拉动拉出菜单的交互界面过程。、
+
+为了排列```SCSpringExpandingView```，我们重写 layoutSubviews 并且等分排列每个 view 的坐标。
+
+```
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    CGFloat interItemSpace = CGRectGetWidth(self.bounds) / self.springExpandViews.count;
+    
+    NSInteger index = 0;
+    for (SCSpringExpandView *springExpandView in self.springExpandViews)
+    {
+        springExpandView.frame = CGRectMake(interItemSpace * index, 0.f, 4.f, 
+                                 CGRectGetHeight(self.bounds));
+        index++;
+    }
+}
+```
+
+现在我们可以展示这些 view 了，我们还需要在被设置 ```setProgress:``` 的方法去更新。如果我们再看看```Unread```，我们可以看到每一个弹簧view 都有三个唯一的状态：缩合，展开与完成。
 
 
 
